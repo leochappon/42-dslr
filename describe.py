@@ -35,10 +35,7 @@ def ft_percentile(column, percentage):
 def ft_max(column):
     return np.sort(column)[-1]
 
-def main():
-    if len(sys.argv) != 2:
-        sys.exit("Dataset required")
-    df = pd.read_csv(sys.argv[1])
+def describe(df):
     df = df._get_numeric_data()
     columns = df.columns.to_numpy()
     column = []
@@ -56,8 +53,14 @@ def main():
         max.append(ft_max(v))
     data = [count, mean, std, min, p25, p50, p75, max]
     index = ['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max']
-    new_df = pd.DataFrame(data, index, columns)
-    print(new_df)
+    return pd.DataFrame(data, index, columns)
+
+def main():
+    if len(sys.argv) != 2:
+        sys.exit("Dataset required")
+    df = pd.read_csv(sys.argv[1])
+    df = describe(df)
+    print(df)
 
 if __name__ == '__main__':
     main()
