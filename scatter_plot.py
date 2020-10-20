@@ -1,55 +1,42 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
+def scatter_plot(df, feature_x, feature_y, string):
+    df = df.set_index("Hogwarts House")
+    df = df.drop(df.columns.difference([feature_x, feature_y]), axis=1)
+    g = df.drop(df.index.difference(["Gryffindor"]))
+    s = df.drop(df.index.difference(["Slytherin"]))
+    r = df.drop(df.index.difference(["Ravenclaw"]))
+    h = df.drop(df.index.difference(["Hufflepuff"]))
+    plt.figure()
+    plt.title(string)
+    plt.scatter(g[feature_x], g[feature_y], c='r', label="Gryffindor", alpha=0.5)
+    plt.scatter(s[feature_x], s[feature_y], c='g', label="Slytherin", alpha=0.5)
+    plt.scatter(r[feature_x], r[feature_y], c='b', label="Ravenclaw", alpha=0.5)
+    plt.scatter(h[feature_x], h[feature_y], c='y', label="Hufflepuff", alpha=0.5)
+    plt.xlabel(feature_x)
+    plt.ylabel(feature_y)
+    plt.legend()
+    plt.show()
+
 def main():
     df = pd.read_csv("dataset_train.csv")
     c = df.corr()
-    ca = c.abs()
-    max1 = 0
-    max2 = 0
+    max = 0
+    min = 0
     for v in c.columns:
         c[v].values[c[v].index.get_loc(v)] = 0
-        ca[v].values[ca[v].index.get_loc(v)] = 0
         s = c[v].sort_values()
-        sa = ca[v].sort_values()
-        if (max1 < s[-1]):
-            max1 = s[-1]
+        if max < s[-1]:
+            max = s[-1]
             feature_1 = v
             feature_2 = s.index[-1]
-        if (max2 < sa[-1]):
-            max2 = sa[-1]
+        if min > s[0]:
+            min = s[0]
             feature_3 = v
-            feature_4 = sa.index[-1]
-    df = df.set_index("Hogwarts House")
-    df1 = df.drop(df.columns.difference([feature_1, feature_2]), axis=1)
-    g = df1.drop(df1.index.difference(["Gryffindor"]))
-    s = df1.drop(df1.index.difference(["Slytherin"]))
-    r = df1.drop(df1.index.difference(["Ravenclaw"]))
-    h = df1.drop(df1.index.difference(["Hufflepuff"]))
-    plt.figure("Scatter plot 1")
-    plt.title("The two similar features")
-    plt.scatter(g[feature_1], g[feature_2], c='r', label="Gryffindor", alpha=0.5)
-    plt.scatter(s[feature_1], s[feature_2], c='g', label="Slytherin", alpha=0.5)
-    plt.scatter(r[feature_1], r[feature_2], c='b', label="Ravenclaw", alpha=0.5)
-    plt.scatter(h[feature_1], h[feature_2], c='y', label="Hufflepuff", alpha=0.5)
-    plt.xlabel(feature_1)
-    plt.ylabel(feature_2)
-    plt.legend()
-    df2 = df.drop(df.columns.difference([feature_3, feature_4]), axis=1)
-    g = df2.drop(df2.index.difference(["Gryffindor"]))
-    s = df2.drop(df2.index.difference(["Slytherin"]))
-    r = df2.drop(df2.index.difference(["Ravenclaw"]))
-    h = df2.drop(df2.index.difference(["Hufflepuff"]))
-    plt.figure("Scatter plot 2")
-    plt.title("The two opposite features")
-    plt.scatter(g[feature_3], g[feature_4], c='r', label="Gryffindor", alpha=0.5)
-    plt.scatter(s[feature_3], s[feature_4], c='g', label="Slytherin", alpha=0.5)
-    plt.scatter(r[feature_3], r[feature_4], c='b', label="Ravenclaw", alpha=0.5)
-    plt.scatter(h[feature_3], h[feature_4], c='y', label="Hufflepuff", alpha=0.5)
-    plt.xlabel(feature_3)
-    plt.ylabel(feature_4)
-    plt.legend()
-    plt.show()
+            feature_4 = s.index[0]
+    scatter_plot(df, feature_1, feature_2, "The 2 most similar features")
+    scatter_plot(df, feature_3, feature_4, "The 2 most different features")
 
 if __name__ == '__main__':
     main()
