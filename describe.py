@@ -57,7 +57,7 @@ def describe(df):
 
 def main():
     if len(sys.argv) != 2:
-        sys.exit("Dataset required")
+        sys.exit('Dataset required')
     df = pd.read_csv(sys.argv[1])
     df = describe(df)
     print(df)

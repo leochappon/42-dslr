@@ -22,16 +22,16 @@ def scatter_plot(df, feature_x, feature_y, string):
 def main():
     df = pd.read_csv("dataset_train.csv")
     c = df.corr()
-    max = 0
-    min = 0
+    max = 2
+    min = -2
     for v in c.columns:
         c[v].values[c[v].index.get_loc(v)] = 0
         s = c[v].sort_values()
-        if max < s[-1]:
+        if max < s[-1] or max == 2:
             max = s[-1]
             feature_1 = v
             feature_2 = s.index[-1]
-        if min > s[0]:
+        if min > s[0] or min == -2:
             min = s[0]
             feature_3 = v
             feature_4 = s.index[0]
