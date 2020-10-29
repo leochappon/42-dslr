@@ -45,6 +45,16 @@ def gradient_descent(X, target):
 
     return theta, cost_history
 
+def sct_target_predictions(classes, features, target, predictions, house, color):
+    for i in range(len(features)):
+        plt.figure(f'{house} : {classes[i]}')
+        plt.title(classes[i])
+        plt.scatter(features[i], predictions, c=color, alpha=0.5)
+        plt.scatter(features[i], target, alpha=0.5)
+        plt.xlabel('Grades')
+        plt.ylabel('Probability')
+    plt.show()
+
 def plt_cost_history(cost_history, house, c):
     plt.xlabel('n_iterations')
     plt.ylabel('cost_history')
@@ -62,7 +72,8 @@ def main():
     df.insert(0, 'Hogwarts House', hs)
     df = df.dropna()
 
-    features = df.drop('Hogwarts House', axis=1).to_numpy()
+    classes = df.drop('Hogwarts House', axis=1)
+    features = classes.to_numpy()
     X = np.hstack((features, np.ones((features.shape[0], 1))))
 
     target = df['Hogwarts House']
@@ -78,6 +89,17 @@ def main():
 
     thetas = np.column_stack((theta_g, theta_s, theta_r, theta_h))
     np.savetxt('thetas.csv', thetas, delimiter=',', header='Gryffindor,Slytherin,Ravenclaw,Hufflepuff', comments='')
+
+    predictions_g = model(X, theta_g)
+    predictions_s = model(X, theta_s)
+    predictions_r = model(X, theta_r)
+    predictions_h = model(X, theta_h)
+
+    features = np.transpose(features)
+    sct_target_predictions(classes.columns, features, target_g, predictions_g, 'Gryffindor', 'r')
+    sct_target_predictions(classes.columns, features, target_s, predictions_s, 'Slytherin', 'g')
+    sct_target_predictions(classes.columns, features, target_r, predictions_r, 'Ravenclaw', 'b')
+    sct_target_predictions(classes.columns, features, target_h, predictions_h, 'Hufflepuff', 'y')
 
     plt.figure()
     plt.title('Cost history of the Hogwarts houses')
