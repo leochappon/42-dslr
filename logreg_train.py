@@ -5,18 +5,26 @@ import matplotlib.pyplot as plt
 
 learning_rate = 0.01
 n_iterations = 2000
-corr_range = 0.7
 
-def corr_fillna(df):
-    for v in df.columns:
-        for w in df.columns:
-            if df[v].corr(df[w]) >= corr_range and v != w:
-                df[v] = df[v].fillna(df[w])
-                df[w] = df[w].fillna(df[v])
-            elif df[v].corr(df[w]) <= -corr_range and v != w:
-                df[v] = df[v].fillna(-df[w])
-                df[w] = df[w].fillna(-df[v])
-    return df
+def standardization(df):
+    return (df - df.mean()) / df.std()
+
+def corr_fillna(df, corr):
+    new_df = df
+    i = 1
+
+    while i >= corr and new_df.isnull().values.any():
+        for v in df.columns:
+            for w in df.columns:
+                if df[v].corr(df[w]) >= i and v != w:
+                    new_df[v] = new_df[v].fillna(df[w])
+                    new_df[w] = new_df[w].fillna(df[v])
+                elif df[v].corr(df[w]) <= -i and v != w:
+                    new_df[v] = new_df[v].fillna(-df[w])
+                    new_df[w] = new_df[w].fillna(-df[v])
+        i -= 0.1
+
+    return new_df
 
 def model(X, theta):
     return 1 / (1 + np.exp(-X.dot(theta)))
@@ -37,16 +45,10 @@ def gradient_descent(X, target):
 
     return theta, cost_history
 
-def coef_determination(target, predictions):
-	u = np.sum((target - predictions) ** 2)
-	v = np.sum((target - np.mean(target)) ** 2)
-
-	return 1 - u / v
-
 def plt_cost_history(cost_history, house, c):
     plt.xlabel('n_iterations')
     plt.ylabel('cost_history')
-    plt.plot(range(n_iterations), cost_history, c=c, label=house)
+    plt.plot(range(n_iterations), cost_history, color=c, label=house)
 
 def main():
     if len(sys.argv) != 2:
@@ -55,10 +57,10 @@ def main():
     df = df.drop(['Index', 'Arithmancy', 'Potions', 'Care of Magical Creatures'], axis=1)
     hs = df['Hogwarts House']
     df = df._get_numeric_data()
-    df = (df - df.mean()) / df.std()
-    df = corr_fillna(df)
+    df = standardization(df)
+    df = corr_fillna(df, 0.7)
     df.insert(0, 'Hogwarts House', hs)
-    df = df.dropna(axis=0)
+    df = df.dropna()
 
     features = df.drop('Hogwarts House', axis=1).to_numpy()
     X = np.hstack((features, np.ones((features.shape[0], 1))))
@@ -75,19 +77,10 @@ def main():
     theta_h, cost_history_h = gradient_descent(X, target_h)
 
     thetas = np.column_stack((theta_g, theta_s, theta_r, theta_h))
-    np.savetxt('thetas.csv', thetas, delimiter=',', header='Gryffindor, Slytherin, Ravenclaw, Hufflepuff', comments='')
-
-    predictions_g = model(X, theta_g)
-    predictions_s = model(X, theta_s)
-    predictions_r = model(X, theta_r)
-    predictions_h = model(X, theta_h)
-    print("Coefficient of determination for Gryffindor: {}".format(coef_determination(target_g, predictions_g)))
-    print("Coefficient of determination for Slytherin: {}".format(coef_determination(target_s, predictions_s)))
-    print("Coefficient of determination for Ravenclaw: {}".format(coef_determination(target_r, predictions_r)))
-    print("Coefficient of determination for Hufflepuff: {}".format(coef_determination(target_h, predictions_h)))
+    np.savetxt('thetas.csv', thetas, delimiter=',', header='Gryffindor,Slytherin,Ravenclaw,Hufflepuff', comments='')
 
     plt.figure()
-    plt.title('Cost history')
+    plt.title('Cost history of the Hogwarts houses')
     plt_cost_history(cost_history_g, "Gryffindor", 'r')
     plt_cost_history(cost_history_s, "Slytherin", 'g')
     plt_cost_history(cost_history_r, "Ravenclaw", 'b')
