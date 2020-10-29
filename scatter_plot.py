@@ -17,7 +17,6 @@ def scatter_plot(df, feature_x, feature_y, string):
     plt.xlabel(feature_x)
     plt.ylabel(feature_y)
     plt.legend()
-    plt.show()
 
 def main():
     df = pd.read_csv("dataset_train.csv")
@@ -37,6 +36,7 @@ def main():
             feature_4 = s.index[0]
     scatter_plot(df, feature_1, feature_2, "The 2 most similar features")
     scatter_plot(df, feature_3, feature_4, "The 2 most different features")
+    plt.show()
 
 if __name__ == '__main__':
     main()
