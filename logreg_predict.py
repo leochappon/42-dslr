@@ -33,7 +33,7 @@ def main():
         if p < predictions_h[i]:
             p = predictions_h[i]
             houses[i] = 'Hufflepuff'
-    houses = pd.DataFrame(houses, columns=['Hogwarts Houses'])
+    houses = pd.DataFrame(houses, columns=['Hogwarts House'])
     houses = houses.rename_axis('Index')
     houses.to_csv('houses.csv')
 
