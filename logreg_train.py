@@ -47,12 +47,12 @@ def gradient_descent(X, target):
 
 def sct_target_predictions(classes, features, target, predictions, house, color):
     for i in range(len(features)):
-        plt.figure(f'{house} : {classes[i]}')
+        plt.figure(f'{house} - {classes[i]}')
         plt.title(classes[i])
         plt.scatter(features[i], predictions, c=color, alpha=0.5)
         plt.scatter(features[i], target, alpha=0.5)
-        plt.xlabel('Grades')
-        plt.ylabel('Probability')
+        plt.xlabel(f'Grades in {classes[i]}')
+        plt.ylabel(f'Probability of being in {house}')
     plt.show()
 
 def plt_cost_history(cost_history, house, c):
